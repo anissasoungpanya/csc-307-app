@@ -64,15 +64,23 @@ app.get("/users/:id", (req, res) => {
 });
 
 const addUser = (user) => {
-  users["users_list"].push(user);
-  return user;
+  const newUser = {id: Math.random().toString(36).substr(2, 6),
+  		   ...user
+  };
+  users["users_list"].push(newUser);
+  return newUser;
 };
 
 app.post("/users", (req, res) => {
   const userToAdd = req.body;
-  addUser(userToAdd);
-  res.send();
-});
+  if (userToAdd && userToAdd.name && userToAdd.job){
+  const result = addUser(userToAdd);
+  if (result){
+  	res.status(201).json(result);
+  } else {
+  	res.status(404).send("Invalid User.");
+  }
+}});
 
 const deleteUser = (id) => {
   const index = users["users_list"].findIndex((user) => user["id"] === id);
@@ -85,7 +93,12 @@ const deleteUser = (id) => {
 
 app.delete("/users/:id", (req, res) => {
 	const id = req.params.id;
-	deleteUser(id);
+	const userDeleted = deleteUser(id);
+	if (userDeleted){
+		res.status(204).send();
+	} else {
+		res.status(404).send("User not found");
+	}
 });
 
 const findUserByNameAndJob = (name, job) => {
