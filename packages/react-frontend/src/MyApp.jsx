@@ -13,9 +13,36 @@ function removeOneCharacter(index){
 	setCharacters(updated);
 	}
 
+function deleteUser(index, id){
+    const promise = fetch("Http://localhost:8000/users/:id", {
+    method: "DELETE",})
+
+  return promise;
+}
+
+function deleteFromList(index, id){
+        deleteUser(person)
+        .then((response) => {
+        if (response.status === 204){
+        const updateCharacters = characters.filter((character, i) =>
+                i !== index);
+        setCharacters(updatedCharacters);
+        } else if (response.status === 404){
+                console.log("User not found.");
+        }
+        }).catch((error) => console.log("Error:", error));
+}
+
 function updateList(person) {
   postUser(person)
-    .then(() => setCharacters([...characters, person]))
+    .then((response) => {
+        if (response.status === 201) {
+          return response.json(); 
+        } else {
+          throw new Error("Failed to create user");
+        }
+      })
+    .then((person) => setCharacters([...characters, person]))
     .catch((error) => {
       console.log(error);
     });
